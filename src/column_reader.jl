@@ -143,6 +143,7 @@ function read_column(path, filemetadata, col_num)
 
         # repeated read data page
         while (from - last_from  < row_group.num_rows) & (from <= length(res))
+            println("meh")
             from = read_data_page_vals!(res, uncompressed_data_buffer, fileio, dict, colchunk_meta.codec, T, from)
 
             if from isa Tuple
@@ -187,6 +188,7 @@ function read_data_page_vals!(res, uncompressed_data_buffer::Vector{UInt8}, file
         uncompressed_data_buffer = Vector{UInt8}(undef, ceil(Int, data_page_header.uncompressed_page_size*1.1))
     end
 
+
     t1 = @_gc_preserve_begin uncompressed_data_buffer
 
     GC.@preserve compressed_data_buffer uncompressed_data_buffer begin
@@ -198,6 +200,7 @@ function read_data_page_vals!(res, uncompressed_data_buffer::Vector{UInt8}, file
     end
 
     @assert length(uncompressed_data) == data_page_header.uncompressed_page_size
+
 
     uncompressed_data_io = IOBuffer(uncompressed_data, read=true, write=false, append=false)
 
@@ -333,7 +336,6 @@ function read_data_page_vals!(res, uncompressed_data_buffer::Vector{UInt8}, file
     if has_missing
         @assert position(missing_bytes_io) == num_values
     end
-
 
 
     if data_page_header.data_page_header.encoding == PAR2.Encoding.PLAIN
